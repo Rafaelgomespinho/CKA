@@ -17,7 +17,7 @@ Criação de certificado auto Assinado SSl
 def lista_if(i):
         import csv
 
-        with open('csv', encoding='utf-8') as ficheiro:
+        with open('Teste.csv', encoding='utf-8') as ficheiro:
             tabela = csv.reader(ficheiro, delimiter=';')
             lista=list(tabela)
             c=len(lista)-1
