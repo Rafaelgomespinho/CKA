@@ -6,7 +6,7 @@ import subprocess
 import os
 from pathlib import Path
 from datetime import date, timedelta
-import teste
+#import teste
 
 print("Script de Criação Chave Auto Assinada")
 
@@ -14,18 +14,22 @@ print("Script de Criação Chave Auto Assinada")
 Criação de certificado auto Assinado SSl
 
 '''
-def lista_if(i):
-        import csv
 
-        with open('Teste.csv', encoding='utf-8') as ficheiro:
-            tabela = csv.reader(ficheiro, delimiter=';')
-            lista=list(tabela)
-            c=len(lista)-1
-            lista2=lista[i]
-            ispb=lista2[0]
-            IF=lista2[1]
-            #print(ispb,IF)
-            return ispb , IF , c
+
+def lista_if(i):
+    import csv
+
+    with open('Teste.csv', encoding='utf-8') as ficheiro:
+        tabela = csv.reader(ficheiro, delimiter=';')
+        lista = list(tabela)
+        c = len(lista)-1
+        lista2 = lista[i]
+        ispb = lista2[0]
+        IF = lista2[1]
+        namespace = str(lista2[2])
+        # print(ispb,IF)
+        return ispb, IF, c, namespace
+
 
 diretorio = "/tmp"
 #cliente = 'teste'
@@ -37,7 +41,6 @@ cont1 = cont = int(lista_if(0)[2])
 a = i = 0
 ambiente = input("Homologação ou Produção? ").strip().upper()[
     0]  # Validar Ambinte melhori
-
 
 while True:
     if ambiente in "Hh":
@@ -71,17 +74,18 @@ while i <= cont:
 
     diretorio1 = diretorio + "/"+lista_if(i)[1] + "/" + ambiente + "/"
     password = str(lista_if(i)[1].capitalize() + "@123")
-    cliente = lista_if(i)[1]
-    ispb = lista_if(i)[0]
-
+    cliente = str(lista_if(i)[1])
+    ispb = str(lista_if(i)[0])
+    namespace = str(lista_if(i)[3])
+    
     print("Criando a Key Digite a senha desejada")
     os.system("openssl genrsa -des3 -passout pass:" + password +
               " -out " + diretorio1 + cliente + "_" + ispb + ".key 2048")
-    
+
     print("Criando Chave Publica CRT")
 
-    os.system("openssl req -passin pass:"+ password+ " -new -x509 -nodes -sha1 -days "+ Vencimento+ " -key "+
-          diretorio1+ cliente+ "_"+ ispb+ ".key > "+ diretorio1+ cliente+ "_"+ ispb+ ".crt -subj '/C=BR/ST=Sao paulo/L=Sao paulo/O="+cliente+"/OU="+cliente+ambiente+"/CN=www."+cliente+".com'" )
+    os.system("openssl req -passin pass:" + password + " -new -x509 -nodes -sha1 -days " + Vencimento + " -key " +
+              diretorio1 + cliente + "_" + ispb + ".key > " + diretorio1 + cliente + "_" + ispb + ".crt -subj '/C=BR/ST=Sao paulo/L=Sao paulo/O="+cliente+"/OU="+cliente+ambiente+"/CN=www."+cliente+".com'")
 
     os.system("openssl rsa -passin pass:" + password + " -in " + diretorio1 + cliente + "_" + ispb +
               ".key -out " + diretorio1 + "no.pwd." + cliente + "_" + ispb + ".key")
@@ -94,6 +98,9 @@ while i <= cont:
 
     os.system("openssl pkcs12 -export -passout pass:" + password+" -in " + diretorio1 + cliente + "_" + ispb + ".crt -inkey " + diretorio1 +
               "no.pwd." + cliente + "_" + ispb + ".key -out " + diretorio1 + cliente + "_" + ispb + "_" + dtvenc + "_" + ambiente + ".pfx")
+
+    print("Gerando script Kubectl")
+    os.system("echo kubectl create secret generic certificate-"+ambiente+" --from-file="+diretorio1 + cliente + "_" + ispb + "_" + dtvenc + "_" + ambiente +"="+diretorio1 + cliente + "_" + ispb + "_" + dtvenc + "_" + ambiente + ".pfx --from-file=" + diretorio1 + cliente + "_" + ispb + ".crt=" + diretorio1 + cliente + "_" + ispb + ".crt -n "+namespace+" >> /tmp/kubectl.txt")
 
     i += 1
 
