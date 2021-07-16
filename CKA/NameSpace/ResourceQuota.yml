@@ -3,6 +3,15 @@ kind: ResourceQuota
 metadata:
     name: computer-quota
     namespace: dev
-    
+
 #Limita cota de maquinas por namespace
+spec:
+  hard:
+    pods: "5"
+    request.cpu: "4"
+    request.memory : 2Gi
+    limits.cpu: "10"
+    limits.memory: 3Gi
+    
+
 
