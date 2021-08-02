@@ -129,7 +129,6 @@ USER 1000
 -------------------------------------------------------------------------
    
 Lembrando que para quem não for modificar nada, pode continuar usando da forma normal.
-kubectl delete pod  spi-worker-deploy-7b76d8d5dc-v52q2 -n bex  --force --grace-period=0
 
 
 
