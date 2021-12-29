@@ -1,0 +1,2 @@
+Troca de Name Space no config permanente 
+#kubectl config set-context $(kubectl config current-context) --namespace=dev
